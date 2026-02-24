@@ -12,11 +12,39 @@ public class MonsterCreator : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        headcount = Random.Range(1, 4); // Randomly determine the number of heads (1 to 3)
+        headcount = Random.Range(1, 3); // Randomly determine the number of heads (1 to 2)
         armcount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
         legcount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
 
-        if (headcount == 1)
+        CreateMonster(headcount, armcount, legcount); // Call the method to create the monster
+    }
+
+    public void Regenerate()
+    {
+        headcount = Random.Range(1, 3); // Randomly determine the number of heads (1 to 2)
+        armcount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
+        legcount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
+
+        DeleteMonster();
+
+        CreateMonster(headcount, armcount, legcount);
+    }
+
+    private void DeleteMonster()
+    {
+        // Destroy existing monster parts
+        foreach(Transform child in monsterStart.transform)
+        {
+            foreach(Transform grandChild in child)
+            {
+                Destroy(grandChild.gameObject); // Destroy each part of the monster
+            }
+        }
+    }
+
+    private void CreateMonster(int HC, int AC, int LC)
+    {
+        if (HC == 1)
         {
             int headIndex = Random.Range(1, 4); // Randomly select a head type (1 to 3)
             GameObject obj = Instantiate(
@@ -62,37 +90,28 @@ public class MonsterCreator : MonoBehaviour
             obj2.transform.localRotation = Quaternion.Euler(90, 0, 0);
         }
 
-        for (int i = 0; i < armcount; i++)
-        {
-            int armIndex = Random.Range(1, 7); // Randomly select an arm type (1 to 6)
-            if (monsterStart.transform.Find("Arm" + armIndex).transform.childCount == 0) // Check if the arm slot is empty
-            {
-                GameObject objarm = Instantiate(
-                    prefab,
-                    monsterStart.transform.Find("Arm" + armIndex).position,
-                    new quaternion(0,0,0,0),
-                    monsterStart.transform.Find("Arm" + armIndex));
-                    
-                objarm.transform.localScale = new Vector3(
-                    0.75f / 100.0f,
-                    0.75f / 100.0f,
-                    0.75f / 100.0f
-                );
+        InstanceObjects(AC, monsterStart, "Arm");
+        InstanceObjects(LC, monsterStart, "Leg"); 
+        
+    }
 
-                objarm.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            }
-        }
-
-        for (int i = 0; i < legcount; i++)
+    // Method to add limbs to the monster based on the specified count, parent object and limbtype, currently using just standard cylinders as placeholders for limbs
+    // also checks if the limb slot is empty before adding
+    // expand to also include limb group as paramerter to choose a specific arm or leg when they are added
+    // Also for now its not used for the head
+    private void InstanceObjects(int count, GameObject parent, string limbType)
+    {
+        for (int i = 0; i < count; i++)
         {
-            int legIndex = Random.Range(1, 7); // Randomly select a leg type (1 to 6)
-            if (monsterStart.transform.Find("Leg" + legIndex).transform.childCount == 0) // Check if the leg slot is empty
+            int Index = Random.Range(1, 7); // Randomly select a leg type (1 to 6)
+
+            if (monsterStart.transform.Find(limbType + Index).transform.childCount == 0) // Check if the limb slot is empty
             {
                 GameObject objleg = Instantiate(
                     prefab,
-                    monsterStart.transform.Find("Leg" + legIndex).position,
+                    monsterStart.transform.Find(limbType + Index).position,
                     new quaternion(0,0,0,0),
-                    monsterStart.transform.Find("Leg" + legIndex));
+                    monsterStart.transform.Find(limbType + Index));
 
                 objleg.transform.localScale = new Vector3(
                     0.75f / 100.0f,
