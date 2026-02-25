@@ -4,8 +4,9 @@ using Random = UnityEngine.Random;
 
 public class MonsterCreator : MonoBehaviour
 {
-    public GameObject monsterStart; // Reference to the monster prefab
-    public GameObject prefab; // Reference to the prefab to instantiate
+    public Transform spawnPoint; // Position where the monster will be spawned
+    public int PointsToSpend; // Total points available for creating the monster, higher points means a stronger monster
+    GameObject Monster; // Reference to the parent object for the monster parts
     private int headcount = 0; // Counter for the number of heads created
     private int armcount = 0; // Counter for the number of arms created
     private int legcount = 0; // Counter for the number of legs created
@@ -32,18 +33,18 @@ public class MonsterCreator : MonoBehaviour
 
     private void DeleteMonster()
     {
-        // Destroy existing monster parts
-        foreach(Transform child in monsterStart.transform)
+        if (Monster != null)
         {
-            foreach(Transform grandChild in child)
-            {
-                Destroy(grandChild.gameObject); // Destroy each part of the monster
-            }
+            Destroy(Monster); // Destroy the existing monster if it exists
         }
     }
 
     private void CreateMonster(int HC, int AC, int LC)
     {
+        int i = Random.Range(1, 3); // Randomly select a torso type (1 to 2)
+        Monster = Resources.Load<GameObject>("Enemy/Limbs/Torsos/Torso" + i); // Load the monster prefab from the Resources folder
+        Instantiate(Monster, spawnPoint.position, Quaternion.identity); // Instantiate the monster at the spawn point
+
         if (HC == 1)
         {
             int headIndex = Random.Range(1, 4); // Randomly select a head type (1 to 3)
