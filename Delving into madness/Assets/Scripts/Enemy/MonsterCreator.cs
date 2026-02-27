@@ -1,5 +1,6 @@
 using Unity.Mathematics;
 using UnityEngine;
+using static Limb;
 using Random = UnityEngine.Random;
 
 public class MonsterCreator : MonoBehaviour
@@ -7,28 +8,34 @@ public class MonsterCreator : MonoBehaviour
     public Transform spawnPoint; // Position where the monster will be spawned
     public int PointsToSpend; // Total points available for creating the monster, higher points means a stronger monster
     GameObject Monster; // Reference to the parent object for the monster parts
-    private int headcount = 0; // Counter for the number of heads created
-    private int armcount = 0; // Counter for the number of arms created
-    private int legcount = 0; // Counter for the number of legs created
+    private int armCount = 0; // Counter for the number of arms created
+    private int legCount = 0; // Counter for the number of legs created
+    private int totalArms;
+    private int totalLegs;
+    private int totalHeads;
+    private int totalTorsos;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        headcount = Random.Range(1, 3); // Randomly determine the number of heads (1 to 2)
-        armcount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
-        legcount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
+        totalArms = Resources.LoadAll<GameObject>("Enemy/Limbs/Arm/").Length;
+        totalLegs = Resources.LoadAll<GameObject>("Enemy/Limbs/Leg/").Length;
+        totalHeads = Resources.LoadAll<GameObject>("Enemy/Limbs/Head/").Length;
+        totalTorsos = Resources.LoadAll<GameObject>("Enemy/Limbs/Torso/").Length;
 
-        CreateMonster(headcount, armcount, legcount); // Call the method to create the monster
+        armCount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
+        legCount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
+
+        CreateMonster(armCount, legCount); // Call the method to create the monster
     }
 
     public void Regenerate()
     {
-        headcount = Random.Range(1, 3); // Randomly determine the number of heads (1 to 2)
-        armcount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
-        legcount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
+        armCount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
+        legCount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
 
         DeleteMonster();
 
-        CreateMonster(headcount, armcount, legcount);
+        CreateMonster(armCount, legCount);
     }
 
     private void DeleteMonster()
@@ -39,60 +46,15 @@ public class MonsterCreator : MonoBehaviour
         }
     }
 
-    private void CreateMonster(int HC, int AC, int LC)
+    private void CreateMonster(int AC, int LC)
     {
-        int i = Random.Range(1, 3); // Randomly select a torso type (1 to 2)
-        Monster = Resources.Load<GameObject>("Enemy/Limbs/Torsos/Torso" + i); // Load the monster prefab from the Resources folder
-        Instantiate(Monster, spawnPoint.position, Quaternion.identity); // Instantiate the monster at the spawn point
+        int i = Random.Range(1, totalTorsos + 1); // Randomly select a torso type (1 to X)
+        GameObject prefab = Resources.Load<GameObject>("Enemy/Limbs/Torso/Torso" + i); // Load the monster prefab from the Resources folder
+        Monster = Instantiate(prefab, spawnPoint.position, Quaternion.identity); // Instantiate the monster at the spawn point
 
-        if (HC == 1)
-        {
-            int headIndex = Random.Range(1, 4); // Randomly select a head type (1 to 3)
-            GameObject obj = Instantiate(
-                prefab,
-                monsterStart.transform.Find("Head" + headIndex).position,
-                new quaternion(0,0,0,0),
-                monsterStart.transform.Find("Head" + headIndex));
-
-            obj.transform.localScale = new Vector3(
-                0.75f / 100.0f,
-                0.75f / 100.0f,
-                0.75f / 100.0f
-            );
-
-            obj.transform.localRotation = Quaternion.Euler(90, 0, 0);
-        }
-        else
-        {
-            GameObject obj1 = Instantiate(
-                prefab,
-                monsterStart.transform.Find("Head2").position,
-                new quaternion(0,0,0,0),
-                monsterStart.transform.Find("Head2"));
-
-            obj1.transform.localScale = new Vector3(
-                0.75f / 100.0f,
-                0.75f / 100.0f,
-                0.75f / 100.0f
-            );
-            GameObject obj2 = Instantiate(
-                prefab,
-                monsterStart.transform.Find("Head3").position,
-                new quaternion(0,0,0,0),
-                monsterStart.transform.Find("Head3"));
-
-            obj2.transform.localScale = new Vector3(
-                0.75f / 100.0f,
-                0.75f / 100.0f,
-                0.75f / 100.0f
-            );
-
-            obj1.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            obj2.transform.localRotation = Quaternion.Euler(90, 0, 0);
-        }
-
-        InstanceObjects(AC, monsterStart, "Arm");
-        InstanceObjects(LC, monsterStart, "Leg"); 
+        InstanceObjects(1, Monster, "Head"); // Add the head to the monster
+        InstanceObjects(AC, Monster, "Arm");
+        InstanceObjects(LC, Monster, "Leg"); 
         
     }
 
@@ -104,23 +66,43 @@ public class MonsterCreator : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            int Index = Random.Range(1, 7); // Randomly select a leg type (1 to 6)
+            int Index = 0;// Randomly select a leg type (1 to 6)
 
-            if (monsterStart.transform.Find(limbType + Index).transform.childCount == 0) // Check if the limb slot is empty
+            int limbcount = 0;
+
+            switch (limbType)
             {
-                GameObject objleg = Instantiate(
-                    prefab,
-                    monsterStart.transform.Find(limbType + Index).position,
-                    new quaternion(0,0,0,0),
-                    monsterStart.transform.Find(limbType + Index));
+                case "Head":
+                    limbcount = totalHeads;
+                    Index = Random.Range(1, 4);
+                    break;
+                case "Arm":
+                    limbcount = totalArms;
+                    Index = Random.Range(1, 7);
+                    break;
+                case "Leg":
+                    limbcount = totalLegs;
+                    Index = Random.Range(1, 7);
+                    break;
+            }
 
-                objleg.transform.localScale = new Vector3(
+            int limbIndex = Random.Range(1, limbcount + 1); // Randomly select a limb type based on the number of available prefabs
+
+            if (parent.transform.Find(limbType + Index).transform.childCount == 0) // Check if the limb slot is empty
+            {
+                GameObject obj = Instantiate(
+                    Resources.Load<GameObject>("Enemy/Limbs/" + limbType + "/" + limbType + limbIndex), // Load the limb prefab from the Resources folder
+                    parent.transform.Find(limbType + Index).position,
+                    new quaternion(0,0,0,0),
+                    parent.transform.Find(limbType + Index));
+
+                obj.transform.localScale = new Vector3(
                     0.75f / 100.0f,
                     0.75f / 100.0f,
                     0.75f / 100.0f
                 );
-                
-                objleg.transform.localRotation = Quaternion.Euler(90, 0, 0);
+
+                obj.transform.localRotation = Quaternion.Euler(90, 0, 0);
             }
         }
     }
