@@ -7,8 +7,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject playerModel;
 
     [Header("Player Stats")]
-    [SerializeField] float movementSpeed = 5;
-    [SerializeField] float turnSpeed = 40f;
+    [SerializeField] float movementSpeed = 5f;
+    [SerializeField] float turnSpeed = 5f;
 
     private InputAction movementAction;
     private Rigidbody rigidBody;
