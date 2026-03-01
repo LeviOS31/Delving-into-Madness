@@ -1,13 +1,11 @@
 using Unity.Mathematics;
 using UnityEngine;
-using static Limb;
 using Random = UnityEngine.Random;
 
 public class MonsterCreator : MonoBehaviour
 {
     public Transform spawnPoint; // Position where the monster will be spawned
     public int PointsToSpend; // Total points available for creating the monster, higher points means a stronger monster
-    GameObject Monster; // Reference to the parent object for the monster parts
     private int armCount = 0; // Counter for the number of arms created
     private int legCount = 0; // Counter for the number of legs created
     private int totalArms;
@@ -33,29 +31,20 @@ public class MonsterCreator : MonoBehaviour
         armCount = Random.Range(2, 7); // Randomly determine the number of arms (2 to 6)
         legCount = Random.Range(2, 7); // Randomly determine the number of legs (2 to 6)
 
-        DeleteMonster();
-
         CreateMonster(armCount, legCount);
-    }
-
-    private void DeleteMonster()
-    {
-        if (Monster != null)
-        {
-            Destroy(Monster); // Destroy the existing monster if it exists
-        }
     }
 
     private void CreateMonster(int AC, int LC)
     {
         int i = Random.Range(1, totalTorsos + 1); // Randomly select a torso type (1 to X)
         GameObject prefab = Resources.Load<GameObject>("Enemy/Limbs/Torso/Torso" + i); // Load the monster prefab from the Resources folder
-        Monster = Instantiate(prefab, spawnPoint.position, Quaternion.identity); // Instantiate the monster at the spawn point
+        GameObject Monster = Instantiate(prefab, spawnPoint.position, Quaternion.identity); // Instantiate the monster at the spawn point
 
         InstanceObjects(1, Monster, "Head"); // Add the head to the monster
         InstanceObjects(AC, Monster, "Arm");
         InstanceObjects(LC, Monster, "Leg"); 
         
+        Monster.GetComponent<EnemyController>().FillStats(); // Update the enemy's stats after adding the limb
     }
 
     // Method to add limbs to the monster based on the specified count, parent object and limbtype, currently using just standard cylinders as placeholders for limbs

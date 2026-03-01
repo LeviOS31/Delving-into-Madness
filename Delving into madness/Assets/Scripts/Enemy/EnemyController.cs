@@ -1,6 +1,14 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
+
+enum State
+{
+    Idle,
+    Wander,
+    Attack
+}
 
 public class EnemyController : MonoBehaviour
 {
@@ -9,20 +17,45 @@ public class EnemyController : MonoBehaviour
     List<Limb> limbs; // Array of limbs that the enemy has
     int Speed = 0; // Speed of the enemy, calculated from the limbs
     bool IsDead = false; // Flag to determine if the enemy is dead
+    public WanderController wandercontroller; // Reference to the Wandercontroller script for handling enemy movement
+    State state;
+    float WanderTimer; 
 
     void Start()
     {
-        
+        state = State.Idle; // Set the initial state to Idle
+        WanderTimer = Random.Range(2f, 5f); // Randomly set the wander timer between 2 and 5 seconds
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
+        if (WanderTimer <= 0 && state != State.Attack)
+        {
+            switch (state)
+            {
+                case State.Idle:
+                    state = State.Wander; // Transition to the Wander state
+                    WanderTimer = Random.Range(2f, 8f); // Reset the wander timer for the next transition
+                    Vector3 wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position);
+                    this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
+                    break;
+                case State.Wander:
+                    state = State.Idle; // Transition back to the Idle state
+                    WanderTimer = Random.Range(1f, 3f); // Reset the wander timer for the next transition
+                    break;
+            }
+        }else if(state == State.Wander)
+        {
+            this.transform.Translate(Vector3.forward * Speed * Time.deltaTime); // Move the enemy forward based on its speed
+        }
     }
 
     public void FillStats()
     {
+        limbs.Add(GetComponent<Limb>()); // Add the torso limb (the parent object) to the list of limbs
+
         foreach (GameObject limbattachpoint in transform)
         {
             if (limbattachpoint.transform.childCount == 1 && limbattachpoint.transform.GetChild(0).GetComponent<Limb>() != null)
