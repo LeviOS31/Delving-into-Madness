@@ -5,6 +5,7 @@ using Random = UnityEngine.Random;
 public class MonsterCreator : MonoBehaviour
 {
     public Transform spawnPoint; // Position where the monster will be spawned
+    public WanderController wanderController; // Reference to the WanderController script for handling enemy movement
     public int PointsToSpend; // Total points available for creating the monster, higher points means a stronger monster
     private int armCount = 0; // Counter for the number of arms created
     private int legCount = 0; // Counter for the number of legs created
@@ -39,6 +40,8 @@ public class MonsterCreator : MonoBehaviour
         int i = Random.Range(1, totalTorsos + 1); // Randomly select a torso type (1 to X)
         GameObject prefab = Resources.Load<GameObject>("Enemy/Limbs/Torso/Torso" + i); // Load the monster prefab from the Resources folder
         GameObject Monster = Instantiate(prefab, spawnPoint.position, Quaternion.identity); // Instantiate the monster at the spawn point
+
+        Monster.GetComponent<EnemyController>().wandercontroller = wanderController; // Set the reference to the WanderController script in the EnemyController script of the monster
 
         InstanceObjects(1, Monster, "Head"); // Add the head to the monster
         InstanceObjects(AC, Monster, "Arm");

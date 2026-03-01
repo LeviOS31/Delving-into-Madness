@@ -63,6 +63,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6058178636126845218}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9170246712034279300}
   m_SourcePrefab: {fileID: 100100000, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
 --- !u!1 &96556254212906199 stripped
 GameObject:
@@ -87,3 +90,17 @@ MonoBehaviour:
   Health: 200
   animator: {fileID: 0}
   attacks: []
+  cost: 0
+--- !u!114 &9170246712034279300
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 96556254212906199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bc42c177202d574f8073f3f5bacc0e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  wandercontroller: {fileID: 0}

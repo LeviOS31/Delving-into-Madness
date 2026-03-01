@@ -1,4 +1,4 @@
-using System;
+    using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -14,12 +14,13 @@ public class EnemyController : MonoBehaviour
 {
     int maxHealth = 0; // Maximum health of the enemy
     int currentHealth = 0; // Current health of the enemy
-    List<Limb> limbs; // Array of limbs that the enemy has
+    List<Limb> limbs = new List<Limb>(); // Array of limbs that the enemy has
     int Speed = 0; // Speed of the enemy, calculated from the limbs
     bool IsDead = false; // Flag to determine if the enemy is dead
     public WanderController wandercontroller; // Reference to the Wandercontroller script for handling enemy movement
     State state;
-    float WanderTimer; 
+    float WanderTimer;
+    Vector3 wandertarget = Vector3.zero; // Target position for wandering
 
     void Start()
     {
@@ -30,6 +31,7 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
         if (WanderTimer <= 0 && state != State.Attack)
         {
@@ -38,7 +40,7 @@ public class EnemyController : MonoBehaviour
                 case State.Idle:
                     state = State.Wander; // Transition to the Wander state
                     WanderTimer = Random.Range(2f, 8f); // Reset the wander timer for the next transition
-                    Vector3 wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position);
+                    wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position, 10f);
                     this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
                     break;
                 case State.Wander:
@@ -46,21 +48,29 @@ public class EnemyController : MonoBehaviour
                     WanderTimer = Random.Range(1f, 3f); // Reset the wander timer for the next transition
                     break;
             }
-        }else if(state == State.Wander)
+        }
+        else if(state == State.Wander)
         {
-            this.transform.Translate(Vector3.forward * Speed * Time.deltaTime); // Move the enemy forward based on its speed
+            if (Vector3.Distance(this.transform.position, wandertarget) < 0.1f)
+            {
+                WanderTimer = 0; // Reset the wander timer for the next transition
+            }
+            else
+            {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, wandertarget, Speed / 2 * Time.deltaTime); // Move the enemy forward based on its speed
+            }
         }
     }
 
     public void FillStats()
     {
-        limbs.Add(GetComponent<Limb>()); // Add the torso limb (the parent object) to the list of limbs
+        limbs.Add(this.GetComponent<Limb>()); // Add the torso limb (the parent object) to the list of limbs
 
-        foreach (GameObject limbattachpoint in transform)
+        foreach (Transform limbattachpoint in transform)
         {
-            if (limbattachpoint.transform.childCount == 1 && limbattachpoint.transform.GetChild(0).GetComponent<Limb>() != null)
+            if (limbattachpoint.childCount == 1 && limbattachpoint.GetChild(0).GetComponent<Limb>() != null)
             {
-                Limb limb = limbattachpoint.transform.GetChild(0).GetComponent<Limb>();
+                Limb limb = limbattachpoint.GetChild(0).GetComponent<Limb>();
                 limbs.Add(limb); // Add the new limb to the list
             }
         }
@@ -70,8 +80,11 @@ public class EnemyController : MonoBehaviour
         foreach (Limb limb in limbs)
         {
             maxHealth += limb.Health; // Add the health of each limb to the max health
-            Speed += limb.Speed / limbs.Count; // Add the speed of each limb to the total speed and divide by the number of limbs to get the average speed
+            Speed += limb.Speed; // Add the speed of each limb to the total speed
         }
+
+        Speed /= limbs.Count; // devide speed by the number of limbs to get the actual speed
+        Speed /= 5;
 
         currentHealth = maxHealth; // Set current health to max health at the start
     }
