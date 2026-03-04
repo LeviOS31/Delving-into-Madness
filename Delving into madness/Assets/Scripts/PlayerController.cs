@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -14,6 +15,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashDuration = 0.2f;
     [SerializeField] private float dashCooldown = 0.5f;
     [SerializeField] private float dashPower = 25;
+    [SerializeField] float health = 100f;
     private bool canDash = true;
 
 
@@ -22,10 +24,13 @@ public class PlayerController : MonoBehaviour
 
     private bool disableMovement;
 
+    private BaseWeapon weaponController;
+
     void Start()
     {
         movementAction = InputSystem.actions.FindAction("Move");
         rigidBody = GetComponent<Rigidbody>();
+        weaponController = gameObject.GetComponentInChildren<BaseWeapon>();
     }
 
     void Update()
@@ -52,6 +57,12 @@ public class PlayerController : MonoBehaviour
     private void OnDash()
     {
         StartCoroutine(Dash());
+        Console.WriteLine("Dash");
+    }
+
+    private void OnAttack()
+    {
+        weaponController.Attack();
     }
 
     private IEnumerator Dash()
@@ -65,5 +76,14 @@ public class PlayerController : MonoBehaviour
         playerHitbox.enabled = true;
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        if (health < 0)
+        {
+            //trigger game over
+        }
     }
 }
