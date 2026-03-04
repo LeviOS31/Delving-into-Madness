@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject playerModel;
     [SerializeField] CapsuleCollider playerHitbox;
+    [SerializeField] UIManager uiManager;
 
     [Header("Player Stats")]
     [SerializeField] float movementSpeed = 5f;
@@ -17,6 +18,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashPower = 25;
     [SerializeField] float health = 100f;
     private bool canDash = true;
+    private float currentHealth;
 
 
     private InputAction movementAction;
@@ -31,6 +33,7 @@ public class PlayerController : MonoBehaviour
         movementAction = InputSystem.actions.FindAction("Move");
         rigidBody = GetComponent<Rigidbody>();
         weaponController = gameObject.GetComponentInChildren<BaseWeapon>();
+        currentHealth = health;
     }
 
     void Update()
@@ -63,6 +66,7 @@ public class PlayerController : MonoBehaviour
     private void OnAttack()
     {
         weaponController.Attack();
+        TakeDamage(5);
     }
 
     private IEnumerator Dash()
@@ -80,8 +84,9 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(float damage)
     {
-        health -= damage;
-        if (health < 0)
+        currentHealth -= damage;
+        uiManager.UpdateHealthBar(health, currentHealth);
+        if (currentHealth < 0)
         {
             //trigger game over
         }
