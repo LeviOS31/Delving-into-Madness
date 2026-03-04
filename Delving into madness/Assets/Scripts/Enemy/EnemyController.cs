@@ -1,4 +1,4 @@
-    using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -7,11 +7,13 @@ enum State
 {
     Idle,
     Wander,
+    Chase,
     Attack
 }
 
 public class EnemyController : MonoBehaviour
 {
+    public Transform player; // Reference to the player's transform for chasing and attacking
     int maxHealth = 0; // Maximum health of the enemy
     int currentHealth = 0; // Current health of the enemy
     List<Limb> limbs = new List<Limb>(); // Array of limbs that the enemy has
@@ -24,6 +26,7 @@ public class EnemyController : MonoBehaviour
 
     void Start()
     {
+        tag = "Enemy";
         state = State.Idle; // Set the initial state to Idle
         WanderTimer = Random.Range(2f, 5f); // Randomly set the wander timer between 2 and 5 seconds
     }
@@ -31,9 +34,16 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (player != null)
+        {    
+            if (Vector3.Distance(player.position, this.transform.position) < 50f && (state != State.Chase || state != State.Attack))
+            {
+                state = State.Chase;
+            }
+        }
 
         WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
-        if (WanderTimer <= 0 && state != State.Attack)
+        if (WanderTimer <= 0 && (state != State.Attack || state != State.Chase))
         {
             switch (state)
             {
@@ -41,7 +51,6 @@ public class EnemyController : MonoBehaviour
                     state = State.Wander; // Transition to the Wander state
                     WanderTimer = Random.Range(2f, 8f); // Reset the wander timer for the next transition
                     wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position, 10f);
-                    this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
                     break;
                 case State.Wander:
                     state = State.Idle; // Transition back to the Idle state
@@ -57,8 +66,16 @@ public class EnemyController : MonoBehaviour
             }
             else
             {
+                this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
                 this.transform.position = Vector3.MoveTowards(this.transform.position, wandertarget, Speed / 2 * Time.deltaTime); // Move the enemy forward based on its speed
             }
+        }
+        else if(state == State.Chase)
+        {
+            Vector3 Playerpos = new Vector3(player.position.x, 0, player.position.z); // Calculate the direction vector from the enemy to the player
+            this.transform.LookAt(Playerpos); // Rotate the enemy to face the player
+            this.transform.position = Vector3.MoveTowards(this.transform.position, Playerpos, Speed * Time.deltaTime);
+            Debug.Log("Chasing player at position: " + Playerpos); // Move the enemy towards the player based on its speed
         }
     }
 

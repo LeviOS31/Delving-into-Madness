@@ -9,7 +9,7 @@ public class WanderController : MonoBehaviour
         for(int i = 0; i < 10; i++) // Try to find a valid wander point up to 10 times
         {
             Vector2 randomPoint = Random.insideUnitCircle * wanderRadius; // Generate a random point within the wander radius
-            Vector3 randomPoint3D = new Vector3(randomPoint.x, -2.5f, randomPoint.y) + currentPosition; // Convert the 2D random point to 3D and offset it by the current position
+            Vector3 randomPoint3D = new Vector3(randomPoint.x, -2.4f, randomPoint.y) + currentPosition; // Convert the 2D random point to 3D and offset it by the current position
 
             NavMeshHit hit;
 
