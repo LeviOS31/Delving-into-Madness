@@ -23,6 +23,7 @@ public class EnemyController : MonoBehaviour
     State state;
     float WanderTimer;
     Vector3 wandertarget = Vector3.zero; // Target position for wandering
+    float detectionRange = 50f; // Range within which the enemy can detect the player
 
     void Start()
     {
@@ -36,38 +37,53 @@ public class EnemyController : MonoBehaviour
     {
         if (player != null)
         {    
-            if (Vector3.Distance(player.position, this.transform.position) < 50f && (state != State.Chase || state != State.Attack))
+            float distance = Vector3.Distance(player.position, this.transform.position);
+            if (distance <= detectionRange && state != State.Chase && state != State.Attack)
             {
+                foreach (Limb limb in limbs)
+                {
+                    foreach (Attack attack in limb.attacks)
+                    {
+                        if (attack.maxRange >= distance)
+                        {
+                            state = State.Attack; // Transition to the Attack state if the player is within attack range
+                            return; // Exit the Update method to prioritize attacking
+                        }
+                    }
+                }
+
                 state = State.Chase;
             }
         }
-
-        WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
-        if (WanderTimer <= 0 && (state != State.Attack || state != State.Chase))
-        {
-            switch (state)
+        if (state == State.Wander || state == State.Idle)
+        {     
+            WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
+            if (WanderTimer <= 0)
             {
-                case State.Idle:
-                    state = State.Wander; // Transition to the Wander state
-                    WanderTimer = Random.Range(2f, 8f); // Reset the wander timer for the next transition
-                    wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position, 10f);
-                    break;
-                case State.Wander:
-                    state = State.Idle; // Transition back to the Idle state
-                    WanderTimer = Random.Range(1f, 3f); // Reset the wander timer for the next transition
-                    break;
+                switch (state)
+                {
+                    case State.Idle:
+                        state = State.Wander; // Transition to the Wander state
+                        WanderTimer = Random.Range(2f, 8f); // Reset the wander timer for the next transition
+                        wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position, 10f);
+                        break;
+                    case State.Wander:
+                        state = State.Idle; // Transition back to the Idle state
+                        WanderTimer = Random.Range(1f, 3f); // Reset the wander timer for the next transition
+                        break;
+                }
             }
-        }
-        else if(state == State.Wander)
-        {
-            if (Vector3.Distance(this.transform.position, wandertarget) < 0.1f)
+            else if (state == State.Wander)
             {
-                WanderTimer = 0; // Reset the wander timer for the next transition
-            }
-            else
-            {
-                this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
-                this.transform.position = Vector3.MoveTowards(this.transform.position, wandertarget, Speed / 2 * Time.deltaTime); // Move the enemy forward based on its speed
+                if (Vector3.Distance(this.transform.position, wandertarget) < 0.1f)
+                {
+                    WanderTimer = 0; // Reset the wander timer for the next transition
+                }
+                else
+                {
+                    this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
+                    this.transform.position = Vector3.MoveTowards(this.transform.position, wandertarget, Speed / 2 * Time.deltaTime); // Move the enemy forward based on its speed
+                }
             }
         }
         else if(state == State.Chase)
@@ -76,6 +92,11 @@ public class EnemyController : MonoBehaviour
             this.transform.LookAt(Playerpos); // Rotate the enemy to face the player
             this.transform.position = Vector3.MoveTowards(this.transform.position, Playerpos, Speed * Time.deltaTime);
             Debug.Log("Chasing player at position: " + Playerpos); // Move the enemy towards the player based on its speed
+        }
+        else if(state == State.Attack)
+        {
+            Debug.Log("Attacking player!");
+            Attack();
         }
     }
 
@@ -98,6 +119,14 @@ public class EnemyController : MonoBehaviour
         {
             maxHealth += limb.Health; // Add the health of each limb to the max health
             Speed += limb.Speed; // Add the speed of each limb to the total speed
+
+            foreach (Attack attack in limb.attacks)
+            {
+                if (attack.maxRange > detectionRange)
+                {
+                    detectionRange = attack.maxRange; // Set the detection range to the maximum range of the attacks
+                }
+            }
         }
 
         Speed /= limbs.Count; // devide speed by the number of limbs to get the actual speed
@@ -112,6 +141,23 @@ public class EnemyController : MonoBehaviour
         if (currentHealth <= 0)
         {
             //Die(); // If health drops to 0 or below, the enemy dies
+        }
+    }
+
+    public void Attack()
+    {
+        foreach (Limb limb in limbs)
+        {
+            foreach (Attack attack in limb.attacks)
+            {
+                float distance = Vector3.Distance(player.position, this.transform.position);
+                if (attack.maxRange >= distance)
+                {
+                    // Perform the attack (e.g., reduce player health, play animation, etc.)
+                    Debug.Log("Performing attack: " + attack.attackName + " with damage: " + attack.damage);
+                    // Implement cooldown logic here if necessary
+                }
+            }
         }
     }
 }
