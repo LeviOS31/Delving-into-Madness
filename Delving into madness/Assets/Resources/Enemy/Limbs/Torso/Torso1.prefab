@@ -66,16 +66,47 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1567719497688332937}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 6571023706375220397}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
       insertIndex: -1
       addedObject: {fileID: -4461225314603361686}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4123624040490949596}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1606949986370032683}
   m_SourcePrefab: {fileID: 100100000, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
 --- !u!1 &96556254212906199 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9c04e3de9c5746c4dbf567a9f32f7902, type: 3}
   m_PrefabInstance: {fileID: 979076308988256646}
   m_PrefabAsset: {fileID: 0}
+--- !u!195 &1567719497688332937
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 96556254212906199}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 1.75
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!114 &6571023706375220397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,8 +124,11 @@ MonoBehaviour:
   CanAttack: 0
   Health: 100
   animator: {fileID: 0}
-  attacks: []
+  attack: {fileID: 0}
   cost: 0
+  attachmentPointsArms: 0
+  attachmentPointsLegs: 0
+  attachmentPointsHeads: 0
 --- !u!114 &-4461225314603361686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -107,4 +141,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6bc42c177202d574f8073f3f5bacc0e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  wandercontroller: {fileID: 0}
+  player: {fileID: 0}
+  state: 0
+--- !u!114 &4123624040490949596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 96556254212906199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0823bfc4318694a4da882ecc32cd37eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Navigator
+--- !u!114 &-1606949986370032683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 96556254212906199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52fa93c660154a34d81b704c04591619, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LimbController

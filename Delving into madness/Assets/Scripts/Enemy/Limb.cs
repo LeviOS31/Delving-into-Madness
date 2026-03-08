@@ -19,6 +19,9 @@ public class Limb : MonoBehaviour
     public Animator animator; // Reference to the Animator component for handling animations
     public Attack attack; // List of attacks that the limb can perform
     public int cost; // Cost to use the limb in the monster creation phase, higher cost means a stronger limb 
+    public int attachmentPointsArms;
+    public int attachmentPointsLegs;
+    public int attachmentPointsHeads;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

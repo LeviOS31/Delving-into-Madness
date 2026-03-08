@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using UnityEngine.AI;
 
-enum State
+public enum State
 {
     Idle,
     Wander,
@@ -13,30 +14,41 @@ enum State
 public class EnemyController : MonoBehaviour
 {
     public Transform player; // Reference to the player's transform for chasing and attacking
-    public WanderController wandercontroller; // Reference to the Wandercontroller script for handling enemy movement
     public State state;
-    
+
+    Navigator navigator;
+    LimbController limbcontroller;
+
     int maxHealth = 0; // Maximum health of the enemy
     int currentHealth = 0; // Current health of the enemy
-    List<Limb> limbs = new List<Limb>(); // Array of limbs that the enemy has
     int Speed = 0; // Speed of the enemy, calculated from the limbs
     bool IsDead = false; // Flag to determine if the enemy is dead
     float WanderTimer;
     Vector3 wandertarget = Vector3.zero; // Target position for wandering
     float detectionRange = 50f; // Range within which the enemy can detect the player
+    NavMeshAgent agent; // Reference to the NavMeshAgent component for pathfinding
 
     void Start()
     {
+        agent = GetComponent<NavMeshAgent>(); 
+        navigator = GetComponent<Navigator>(); 
+        limbcontroller = GetComponent<LimbController>();
+
         tag = "Enemy";
-        state = State.Idle; // Set the initial state to Idle
-        WanderTimer = Random.Range(2f, 5f); // Randomly set the wander timer between 2 and 5 seconds
+        state = State.Idle;
+        WanderTimer = Random.Range(2f, 5f);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (IsDead)
+        {
+            return; // If the enemy is dead, exit the update loop
+        }
+
         if (player != null)
-        {    
+        {
             float distance = Vector3.Distance(player.position, this.transform.position);
             if (distance <= detectionRange && state != State.Battle)
             {
@@ -45,68 +57,65 @@ public class EnemyController : MonoBehaviour
         }
 
         if (state == State.Wander || state == State.Idle)
-        {     
-            WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
+        {
+            WanderTimer -= Time.deltaTime;
             if (WanderTimer <= 0)
             {
                 switch (state)
                 {
                     case State.Idle:
-                        state = State.Wander; // Transition to the Wander state
-                        WanderTimer = Random.Range(2f, 8f); // Reset the wander timer for the next transition
-                        wandertarget = wandercontroller.FindNextWanderPoint(this.transform.position, 10f);
+                        state = State.Wander;
+                        WanderTimer = Random.Range(2f, 8f);
+                        agent.speed = Speed / 2;
+                        agent.SetDestination(navigator.FindNextWanderPoint(10f)); 
                         break;
                     case State.Wander:
-                        state = State.Idle; // Transition back to the Idle state
-                        WanderTimer = Random.Range(1f, 3f); // Reset the wander timer for the next transition
+                        state = State.Idle;
+                        agent.SetDestination(this.transform.position);
+                        WanderTimer = Random.Range(1f, 3f);
                         break;
                 }
             }
-            else if (state == State.Wander)
+            else if (agent.remainingDistance < 0.1f)
             {
-                if (Vector3.Distance(this.transform.position, wandertarget) < 0.1f)
-                {
-                    WanderTimer = 0; // Reset the wander timer for the next transition
-                }
-                else
-                {
-                    this.transform.LookAt(wandertarget); // Rotate the enemy to face the wander target
-                    this.transform.position = Vector3.MoveTowards(this.transform.position, wandertarget, Speed / 2 * Time.deltaTime); // Move the enemy forward based on its speed
-                }
+                WanderTimer = 0;
             }
         }
     }
 
     public void FillStats()
     {
-        limbs.Add(this.GetComponent<Limb>()); // Add the torso limb (the parent object) to the list of limbs
+        limbcontroller.limbs.Add(this.GetComponent<Limb>());
 
         foreach (Transform limbattachpoint in transform)
         {
             if (limbattachpoint.childCount == 1 && limbattachpoint.GetChild(0).GetComponent<Limb>() != null)
             {
                 Limb limb = limbattachpoint.GetChild(0).GetComponent<Limb>();
-                limbs.Add(limb); // Add the new limb to the list
+                limbcontroller.limbs.Add(limb);
             }
         }
-        maxHealth = 0; // Reset max health before calculating
-        Speed = 0; // Reset speed before calculating
+        maxHealth = 0;
+        Speed = 0; 
 
-        foreach (Limb limb in limbs)
+        foreach (Limb limb in limbcontroller.limbs)
         {
-            maxHealth += limb.Health; // Add the health of each limb to the max health
-            Speed += limb.Speed; // Add the speed of each limb to the total speed
+            maxHealth += limb.Health;
+            Speed += limb.Speed;
 
-            if (limb.attack.maxRange > detectionRange)
+            if (limb.attack != null)
             {
-                detectionRange = limb.attack.maxRange; // Set the detection range to the maximum range of the attacks
+                if (limb.attack.maxRange > detectionRange)
+                {
+                    detectionRange = limb.attack.maxRange;
+                }
             }
         }
 
-        Speed /= limbs.Count; // devide speed by the number of limbs to get the actual speed
+        Speed /= limbcontroller.limbs.Count;
         Speed /= 5;
 
-        currentHealth = maxHealth; // Set current health to max health at the start
+        currentHealth = maxHealth;
     }
 
     public void TakeDamage(int damage)
@@ -117,4 +126,6 @@ public class EnemyController : MonoBehaviour
             //Die(); // If health drops to 0 or below, the enemy dies
         }
     }
+
+
 }
