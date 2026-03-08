@@ -7,5 +7,6 @@ public class Attack : ScriptableObject
     public int damage; // Damage dealt by the attack
     public float minRange; //Min range of the attack
     public float maxRange; //Max range of the attack
+    public bool isMelee; // Flag to determine if the attack is melee or ranged
     public float cooldown = 3; // Cooldown time for the attack in seconds
 }

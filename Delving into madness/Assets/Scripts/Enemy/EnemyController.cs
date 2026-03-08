@@ -7,20 +7,20 @@ enum State
 {
     Idle,
     Wander,
-    Chase,
-    Attack
+    Battle,
 }
 
 public class EnemyController : MonoBehaviour
 {
     public Transform player; // Reference to the player's transform for chasing and attacking
+    public WanderController wandercontroller; // Reference to the Wandercontroller script for handling enemy movement
+    public State state;
+    
     int maxHealth = 0; // Maximum health of the enemy
     int currentHealth = 0; // Current health of the enemy
     List<Limb> limbs = new List<Limb>(); // Array of limbs that the enemy has
     int Speed = 0; // Speed of the enemy, calculated from the limbs
     bool IsDead = false; // Flag to determine if the enemy is dead
-    public WanderController wandercontroller; // Reference to the Wandercontroller script for handling enemy movement
-    State state;
     float WanderTimer;
     Vector3 wandertarget = Vector3.zero; // Target position for wandering
     float detectionRange = 50f; // Range within which the enemy can detect the player
@@ -38,23 +38,12 @@ public class EnemyController : MonoBehaviour
         if (player != null)
         {    
             float distance = Vector3.Distance(player.position, this.transform.position);
-            if (distance <= detectionRange && state != State.Chase && state != State.Attack)
+            if (distance <= detectionRange && state != State.Battle)
             {
-                foreach (Limb limb in limbs)
-                {
-                    foreach (Attack attack in limb.attacks)
-                    {
-                        if (attack.maxRange >= distance)
-                        {
-                            state = State.Attack; // Transition to the Attack state if the player is within attack range
-                            return; // Exit the Update method to prioritize attacking
-                        }
-                    }
-                }
-
-                state = State.Chase;
+                state = State.Battle;
             }
         }
+
         if (state == State.Wander || state == State.Idle)
         {     
             WanderTimer -= Time.deltaTime; // Decrease the wander timer by the time elapsed since the last frame
@@ -86,18 +75,6 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
-        else if(state == State.Chase)
-        {
-            Vector3 Playerpos = new Vector3(player.position.x, 0, player.position.z); // Calculate the direction vector from the enemy to the player
-            this.transform.LookAt(Playerpos); // Rotate the enemy to face the player
-            this.transform.position = Vector3.MoveTowards(this.transform.position, Playerpos, Speed * Time.deltaTime);
-            Debug.Log("Chasing player at position: " + Playerpos); // Move the enemy towards the player based on its speed
-        }
-        else if(state == State.Attack)
-        {
-            Debug.Log("Attacking player!");
-            Attack();
-        }
     }
 
     public void FillStats()
@@ -120,12 +97,9 @@ public class EnemyController : MonoBehaviour
             maxHealth += limb.Health; // Add the health of each limb to the max health
             Speed += limb.Speed; // Add the speed of each limb to the total speed
 
-            foreach (Attack attack in limb.attacks)
+            if (limb.attack.maxRange > detectionRange)
             {
-                if (attack.maxRange > detectionRange)
-                {
-                    detectionRange = attack.maxRange; // Set the detection range to the maximum range of the attacks
-                }
+                detectionRange = limb.attack.maxRange; // Set the detection range to the maximum range of the attacks
             }
         }
 
@@ -141,23 +115,6 @@ public class EnemyController : MonoBehaviour
         if (currentHealth <= 0)
         {
             //Die(); // If health drops to 0 or below, the enemy dies
-        }
-    }
-
-    public void Attack()
-    {
-        foreach (Limb limb in limbs)
-        {
-            foreach (Attack attack in limb.attacks)
-            {
-                float distance = Vector3.Distance(player.position, this.transform.position);
-                if (attack.maxRange >= distance)
-                {
-                    // Perform the attack (e.g., reduce player health, play animation, etc.)
-                    Debug.Log("Performing attack: " + attack.attackName + " with damage: " + attack.damage);
-                    // Implement cooldown logic here if necessary
-                }
-            }
         }
     }
 }

@@ -132,5 +132,5 @@ MonoBehaviour:
   CanAttack: 1
   Health: 50
   animator: {fileID: 0}
-  attacks:
-  - {fileID: 11400000, guid: c105e529deb3da84fbf0015f72da3e19, type: 2}
+  attack: {fileID: 11400000, guid: c105e529deb3da84fbf0015f72da3e19, type: 2}
+  cost: 0
