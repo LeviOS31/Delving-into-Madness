@@ -24,31 +24,39 @@ public class Navigator : MonoBehaviour
 
     public Vector3 FindAttackPosition(Vector3 playerPos, float attackDistance)
     {
-        Vector3 bestpoint = this.transform.position;
-        float score = -1000f;
+    // Start with current position as fallback
+    Vector3 bestPoint = transform.position;
+    
+    float bestScore = -float.MaxValue;
 
-        for (int i = 0; i < 8; i++)
+    float distanceToPlayer = Vector3.Distance(transform.position, playerPos);
+
+    float searchRadius = Mathf.Clamp(Mathf.Abs(distanceToPlayer - attackDistance), 0.5f, 10f); 
+
+    for (int i = 0; i < 8; i++)
+    {
+        float angle = i * 45f * Mathf.Deg2Rad;
+        Vector3 dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+        
+        Vector3 testPosition = transform.position + dir * searchRadius;
+
+        if (NavMesh.SamplePosition(testPosition, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
-            float angle = i * 45f * Mathf.Deg2Rad;
-            Vector3 dir =  new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
-            Vector3 testposition = playerPos + dir * attackDistance;
+            float distFromSpotToPlayer = Vector3.Distance(hit.position, playerPos);
+            
 
-            NavMeshHit hit;
+            float distanceError = Mathf.Abs(distFromSpotToPlayer - attackDistance);
 
-            if (NavMesh.SamplePosition(testposition, out hit, 2, NavMesh.AllAreas))
+            float score = -distanceError - (Vector3.Distance(transform.position, hit.position) * 0.2f);
+
+            if (score > bestScore)
             {
-                float distBetweenTargetAndPlayer = Vector3.Distance(playerPos, hit.position);
-                float distBetweenTargetAndEnemy = Vector3.Distance(this.transform.position, hit.position);
-
-                float newscore = distBetweenTargetAndPlayer - distBetweenTargetAndEnemy;
-                if (newscore > score)
-                {
-                    score = newscore;
-                    bestpoint = hit.position;
-                }
+                bestScore = score;
+                bestPoint = hit.position;
             }
         }
+    }
 
-        return bestpoint;
+    return bestPoint;
     }
 }

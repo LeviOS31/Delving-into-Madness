@@ -40,8 +40,8 @@ public class MonsterCreator : MonoBehaviour
         GameObject prefab = Resources.Load<GameObject>("Enemy/Limbs/Torso/Torso" + i);
         GameObject Monster = Instantiate(prefab, spawnPoint.position, Quaternion.identity);
 
-        armCount = armCount > Monster.transform.Find("Torso").GetComponent<Limb>().attachmentPointsArms ? Monster.transform.Find("Torso").GetComponent<Limb>().attachmentPointsArms : armCount;
-        legCount = legCount > Monster.transform.Find("Torso").GetComponent<Limb>().attachmentPointsLegs ? Monster.transform.Find("Torso").GetComponent<Limb>().attachmentPointsLegs : legCount;
+        armCount = armCount > Monster.GetComponent<Limb>().attachmentPointsArms ? Monster.GetComponent<Limb>().attachmentPointsArms : armCount;
+        legCount = legCount > Monster.GetComponent<Limb>().attachmentPointsLegs ? Monster.GetComponent<Limb>().attachmentPointsLegs : legCount;
 
         InstanceObjects(1, Monster, "Head"); // Add the head to the monster
         InstanceObjects(AC, Monster, "Arm");

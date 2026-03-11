@@ -126,9 +126,9 @@ MonoBehaviour:
   animator: {fileID: 0}
   attack: {fileID: 0}
   cost: 0
-  attachmentPointsArms: 0
-  attachmentPointsLegs: 0
-  attachmentPointsHeads: 0
+  attachmentPointsArms: 6
+  attachmentPointsLegs: 6
+  attachmentPointsHeads: 3
 --- !u!114 &-4461225314603361686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -167,3 +167,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52fa93c660154a34d81b704c04591619, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LimbController
+  limbs: []

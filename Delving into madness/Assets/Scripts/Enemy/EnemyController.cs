@@ -9,6 +9,7 @@ public enum State
     Idle,
     Wander,
     Battle,
+    Attacking,
 }
 
 public class EnemyController : MonoBehaviour
@@ -28,7 +29,7 @@ public class EnemyController : MonoBehaviour
     float detectionRange = 50f; // Range within which the enemy can detect the player
     NavMeshAgent agent; // Reference to the NavMeshAgent component for pathfinding
 
-    void Start()
+    void Awake()
     {
         agent = GetComponent<NavMeshAgent>(); 
         navigator = GetComponent<Navigator>(); 
@@ -39,7 +40,6 @@ public class EnemyController : MonoBehaviour
         WanderTimer = Random.Range(2f, 5f);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (IsDead)
@@ -47,25 +47,37 @@ public class EnemyController : MonoBehaviour
             return; // If the enemy is dead, exit the update loop
         }
 
-        if (player != null)
+        if (player != null && state != State.Attacking)
         {
             float distance = Vector3.Distance(player.position, this.transform.position);
             if (distance <= detectionRange && state != State.Battle)
             {
                 state = State.Battle;
+                agent.SetDestination(this.transform.position);
+                agent.speed = Speed;
             }
+        }
+
+        if (state == State.Attacking)
+        {
+            agent.isStopped = true;
+            Debug.Log("Attacking");
+        }
+        else
+        {
+            agent.isStopped = false;
         }
 
         if (state == State.Wander || state == State.Idle)
         {
             WanderTimer -= Time.deltaTime;
-            if (WanderTimer <= 0)
+            if (WanderTimer <= 0 || (agent.remainingDistance < 0.5f && state == State.Wander))
             {
                 switch (state)
                 {
                     case State.Idle:
                         state = State.Wander;
-                        WanderTimer = Random.Range(2f, 8f);
+                        WanderTimer = Random.Range(2f, 5f);
                         agent.speed = Speed / 2;
                         agent.SetDestination(navigator.FindNextWanderPoint(10f)); 
                         break;
@@ -76,9 +88,28 @@ public class EnemyController : MonoBehaviour
                         break;
                 }
             }
-            else if (agent.remainingDistance < 0.1f)
+        }
+        else if (state == State.Battle)
+        {
+            //TODO: check if enemy can attack
+            float currentDistToPlayer = Vector3.Distance(transform.position, player.position);
+
+            Limb bestAttackLimb = limbcontroller.getBestAttack(currentDistToPlayer);
+
+            Debug.Log("Current distance to player: " + currentDistToPlayer);
+
+            float perfectdistance = (bestAttackLimb.attack.minRange + bestAttackLimb.attack.maxRange) / 2f;
+
+            if (currentDistToPlayer >= bestAttackLimb.attack.minRange && currentDistToPlayer <= bestAttackLimb.attack.maxRange && bestAttackLimb.CanAttack)
             {
-                WanderTimer = 0;
+                agent.SetDestination(this.transform.position); // Stop moving to attack
+                bestAttackLimb.Attack(player.gameObject, currentDistToPlayer, this);
+                state = State.Attacking;
+            }
+            if (currentDistToPlayer > perfectdistance + 2 || currentDistToPlayer < perfectdistance - 2)
+            {
+
+                agent.SetDestination(navigator.FindAttackPosition(player.position, perfectdistance));
             }
         }
     }

@@ -15,4 +15,26 @@ public class LimbController : MonoBehaviour
     {
         
     }
+
+    public Limb getBestAttack(float playerDistance, bool LineOfSight = true)
+    {
+        Limb bestLimb = null;
+        float bestScore = -float.MaxValue;
+
+        foreach (Limb limb in limbs)
+        {
+            if (limb.attack == null)
+            {
+                continue; // Skip limbs that cannot attack
+            }
+            float score = limb.GetAttackScore(playerDistance, LineOfSight);
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestLimb = limb;
+            }
+        }
+
+        return bestLimb;
+    }
 }
