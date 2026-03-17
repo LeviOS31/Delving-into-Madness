@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Tentical_Whip
   m_EditorClassIdentifier: Assembly-CSharp::Attack
   attackName: Tentical Whip
+  ANIMNAME: Arm2_attack
   damage: 30
-  minRange: 10
-  maxRange: 30
+  minRange: 5
+  maxRange: 12
+  isMelee: 1
+  cooldown: 3

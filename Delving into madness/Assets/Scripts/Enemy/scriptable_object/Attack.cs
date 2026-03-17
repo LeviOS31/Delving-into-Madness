@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 public class Attack : ScriptableObject
 {
     public string attackName; // Name of the attack/name of animation
+    public string ANIMNAME;// used for now to play animation later to be handeled by inverse kinematics
     public int damage; // Damage dealt by the attack
     public float minRange; //Min range of the attack
     public float maxRange; //Max range of the attack
@@ -17,6 +18,11 @@ public class Attack : ScriptableObject
         // Implement the logic to perform the attack on the target
         // This could involve playing an animation, applying damage, etc.
         Debug.Log("Attacking " + target.name + " with " + attackName + " from " + distanceToTarget);
+
+        attacker.GetComponentInChildren<attackDectection>(true).damage = damage;
+
+        attacker.GetComponent<Animation>().Play(ANIMNAME);
+
         await Task.Delay(1000);
         attacker.state = State.Battle;
     }

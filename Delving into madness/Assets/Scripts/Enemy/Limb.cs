@@ -18,7 +18,7 @@ public class Limb : MonoBehaviour
     public int Speed; // Speed to calculate the monsters movement speed
     public bool CanAttack = true; // Flag to determine if the limb can attack (e.g., for cooldowns)
     public int Health; // Health of the limb, if it reaches 0 the limb is destroyed and removed from the monster
-    public Animator animator; // Reference to the Animator component for handling animations
+    //public AnimationClip attackAnim; // Reference to the animation
     public Attack attack; // List of attacks that the limb can perform
     public int cost; // Cost to use the limb in the monster creation phase, higher cost means a stronger limb 
     public int attachmentPointsArms;

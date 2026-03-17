@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.AI;
+using TMPro;
 
 public enum State
 {
@@ -61,7 +62,6 @@ public class EnemyController : MonoBehaviour
         if (state == State.Attacking)
         {
             agent.isStopped = true;
-            Debug.Log("Attacking");
         }
         else
         {
@@ -96,19 +96,23 @@ public class EnemyController : MonoBehaviour
 
             Limb bestAttackLimb = limbcontroller.getBestAttack(currentDistToPlayer);
 
-            Debug.Log("Current distance to player: " + currentDistToPlayer);
+            //Debug.Log("Current distance to player: " + currentDistToPlayer);
 
             float perfectdistance = (bestAttackLimb.attack.minRange + bestAttackLimb.attack.maxRange) / 2f;
 
             if (currentDistToPlayer >= bestAttackLimb.attack.minRange && currentDistToPlayer <= bestAttackLimb.attack.maxRange && bestAttackLimb.CanAttack)
             {
-                agent.SetDestination(this.transform.position); // Stop moving to attack
+                agent.SetDestination(this.transform.position);
+                agent.isStopped = true;
+
+                Vector3 lookatpos = new Vector3(player.position.x, transform.position.y, player.position.z);
+                transform.LookAt(lookatpos);
+
                 bestAttackLimb.Attack(player.gameObject, currentDistToPlayer, this);
                 state = State.Attacking;
             }
             if (currentDistToPlayer > perfectdistance + 2 || currentDistToPlayer < perfectdistance - 2)
             {
-
                 agent.SetDestination(navigator.FindAttackPosition(player.position, perfectdistance));
             }
         }
@@ -154,9 +158,14 @@ public class EnemyController : MonoBehaviour
         currentHealth -= damage; // Reduce current health by the damage taken
         if (currentHealth <= 0)
         {
-            //Die(); // If health drops to 0 or below, the enemy dies
+            Die();
         }
     }
 
-
+    private void Die()
+    {
+        IsDead = true;
+        Debug.Log("Enemy died!");
+        Destroy(gameObject, 1f);
+    }
 }

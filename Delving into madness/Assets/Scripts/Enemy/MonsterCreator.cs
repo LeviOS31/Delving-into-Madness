@@ -15,6 +15,8 @@ public class MonsterCreator : MonoBehaviour
     private int totalTorsos;
     void Start()
     {
+        Application.targetFrameRate = 60;
+
         totalArms = Resources.LoadAll<GameObject>("Enemy/Limbs/Arm/").Length;
         totalLegs = Resources.LoadAll<GameObject>("Enemy/Limbs/Leg/").Length;
         totalHeads = Resources.LoadAll<GameObject>("Enemy/Limbs/Head/").Length;

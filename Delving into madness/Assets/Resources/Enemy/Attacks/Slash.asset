@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Slash
   m_EditorClassIdentifier: Assembly-CSharp::Attack
   attackName: Slash with claws
-  damage: 50
+  ANIMNAME: Arm1_attack
+  damage: 20
   minRange: 0
-  maxRange: 10
+  maxRange: 3.5
+  isMelee: 1
+  cooldown: 3

@@ -131,6 +131,8 @@ MonoBehaviour:
   Speed: 10
   CanAttack: 1
   Health: 50
-  animator: {fileID: 0}
   attack: {fileID: 11400000, guid: 7f6ec720cdf9dc541bca2e58389597ea, type: 2}
   cost: 0
+  attachmentPointsArms: 0
+  attachmentPointsLegs: 0
+  attachmentPointsHeads: 0
