@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -59,14 +60,18 @@ public class PlayerController : MonoBehaviour
 
     private void OnDash()
     {
-        StartCoroutine(Dash());
-        Console.WriteLine("Dash");
+        if (canDash) StartCoroutine(Dash());
     }
 
     private void OnAttack()
     {
         weaponController.Attack();
         TakeDamage(5);
+    }
+
+    private void OnRestart()
+    {
+        SceneManager.LoadScene("Player_Movement_Scene");
     }
 
     private IEnumerator Dash()
@@ -86,9 +91,9 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth -= damage;
         uiManager.UpdateHealthBar(health, currentHealth);
-        if (currentHealth < 0)
+        if (currentHealth <= 0)
         {
-            //trigger game over
+            SceneManager.LoadScene("Main_Menu");
         }
     }
 }
