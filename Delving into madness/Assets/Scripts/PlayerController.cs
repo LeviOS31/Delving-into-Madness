@@ -27,13 +27,13 @@ public class PlayerController : MonoBehaviour
 
     private bool disableMovement;
 
-    private BaseWeapon weaponController;
+    private IWeapon weaponController;
 
     void Start()
     {
         movementAction = InputSystem.actions.FindAction("Move");
         rigidBody = GetComponent<Rigidbody>();
-        weaponController = gameObject.GetComponentInChildren<BaseWeapon>();
+        weaponController = gameObject.GetComponentInChildren<IWeapon>();
         currentHealth = health;
     }
 
@@ -65,8 +65,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnAttack()
     {
-        weaponController.Attack();
-        TakeDamage(5);
+        weaponController.LightAttack();
     }
 
     private void OnRestart()
