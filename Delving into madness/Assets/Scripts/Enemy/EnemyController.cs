@@ -41,6 +41,14 @@ public class EnemyController : MonoBehaviour
         WanderTimer = Random.Range(2f, 5f);
     }
 
+    void Start()
+    {
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player").transform; // Find the player by tag if not assigned
+        }
+    }
+
     void Update()
     {
         if (IsDead)
