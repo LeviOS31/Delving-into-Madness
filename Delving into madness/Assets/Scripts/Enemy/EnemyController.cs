@@ -20,6 +20,7 @@ public class EnemyController : MonoBehaviour
 
     Navigator navigator;
     LimbController limbcontroller;
+    EnemyUI UI;
 
     int maxHealth = 0; // Maximum health of the enemy
     int currentHealth = 0; // Current health of the enemy
@@ -35,6 +36,7 @@ public class EnemyController : MonoBehaviour
         agent = GetComponent<NavMeshAgent>(); 
         navigator = GetComponent<Navigator>(); 
         limbcontroller = GetComponent<LimbController>();
+        UI = GetComponentInChildren<EnemyUI>();
 
         tag = "Enemy";
         state = State.Idle;
