@@ -109,5 +109,13 @@ public class SwordAndShield : MonoBehaviour, IWeapon, DamageModification
     private void OnTriggerEnter(Collider other)
     {
         // Attack Enemy
+        if (other.CompareTag("Enemy"))
+        {
+            float damage = CalculateDamage(10, other.transform.position);
+
+            Debug.Log("Damage dealt: " + damage);
+
+            other.GetComponent<EnemyController>().TakeDamage(damage);
+        }
     }
 }

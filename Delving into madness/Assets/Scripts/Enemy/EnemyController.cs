@@ -41,6 +41,14 @@ public class EnemyController : MonoBehaviour
         WanderTimer = Random.Range(2f, 5f);
     }
 
+    private void Start()
+    {
+        if (player == null)
+        {
+            player = GameObject.FindGameObjectWithTag("Player").transform; // Automatically find the player by tag if not assigned
+        }
+    }
+
     void Update()
     {
         if (IsDead)
@@ -150,12 +158,14 @@ public class EnemyController : MonoBehaviour
         Speed /= limbcontroller.limbs.Count;
         Speed /= 5;
 
+        maxHealth = maxHealth / 4;
+
         currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
-        currentHealth -= damage; // Reduce current health by the damage taken
+        currentHealth -= (int)Math.Round(damage); // Reduce current health by the damage taken
         if (currentHealth <= 0)
         {
             Die();
@@ -166,6 +176,6 @@ public class EnemyController : MonoBehaviour
     {
         IsDead = true;
         Debug.Log("Enemy died!");
-        Destroy(gameObject, 1f);
+        Destroy(gameObject, 0.1f);
     }
 }

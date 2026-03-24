@@ -13,6 +13,7 @@ public class MonsterCreator : MonoBehaviour
     private int totalLegs;
     private int totalHeads;
     private int totalTorsos;
+    private float timer;
     void Start()
     {
         Application.targetFrameRate = 60;
@@ -28,6 +29,22 @@ public class MonsterCreator : MonoBehaviour
         CreateMonster(armCount, legCount);
     }
 
+    private void Update()
+    {
+        timer += Time.deltaTime;
+
+        if (timer >= 2)
+        {
+            GameObject[] list = GameObject.FindGameObjectsWithTag("Enemy");
+            if (list.Length < 1)
+            {
+                Regenerate();
+            }
+
+            timer = 0;
+        }
+    }
+
     public void Regenerate()
     {
         armCount = Random.Range(2, 7);
@@ -35,6 +52,7 @@ public class MonsterCreator : MonoBehaviour
 
         CreateMonster(armCount, legCount);
     }
+
 
     private void CreateMonster(int AC, int LC)
     {
