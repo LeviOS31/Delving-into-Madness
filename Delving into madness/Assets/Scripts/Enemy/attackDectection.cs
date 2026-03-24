@@ -7,7 +7,7 @@ public class attackDectection : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            other.GetComponent<FakePlayerController>().TakeDamage(damage); //To be replaced by real playercontroller
+            other.GetComponent<PlayerController>().TakeDamage(damage); //To be replaced by real playercontroller
         }
     }
 }

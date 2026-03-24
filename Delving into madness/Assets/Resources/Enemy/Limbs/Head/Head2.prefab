@@ -130,6 +130,9 @@ MonoBehaviour:
   limbType: 0
   Speed: 30
   CanAttack: 0
-  Health: 25
-  animator: {fileID: 0}
-  attacks: []
+  Health: 5
+  attack: {fileID: 0}
+  cost: 0
+  attachmentPointsArms: 0
+  attachmentPointsLegs: 0
+  attachmentPointsHeads: 0

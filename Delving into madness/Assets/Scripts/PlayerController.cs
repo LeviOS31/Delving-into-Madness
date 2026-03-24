@@ -1,12 +1,15 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] GameObject playerModel;
     [SerializeField] CapsuleCollider playerHitbox;
+    [SerializeField] UIManager uiManager;
 
     [Header("Player Stats")]
     [SerializeField] float movementSpeed = 5f;
@@ -14,7 +17,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float dashDuration = 0.2f;
     [SerializeField] private float dashCooldown = 0.5f;
     [SerializeField] private float dashPower = 25;
+    [SerializeField] float health = 100f;
     private bool canDash = true;
+    private float currentHealth;
 
 
     private InputAction movementAction;
@@ -22,10 +27,14 @@ public class PlayerController : MonoBehaviour
 
     private bool disableMovement;
 
+    private IWeapon weaponController;
+
     void Start()
     {
         movementAction = InputSystem.actions.FindAction("Move");
         rigidBody = GetComponent<Rigidbody>();
+        weaponController = gameObject.GetComponentInChildren<IWeapon>();
+        currentHealth = health;
     }
 
     void Update()
@@ -51,7 +60,17 @@ public class PlayerController : MonoBehaviour
 
     private void OnDash()
     {
-        StartCoroutine(Dash());
+        if (canDash) StartCoroutine(Dash());
+    }
+
+    private void OnAttack()
+    {
+        weaponController.LightAttack();
+    }
+
+    private void OnRestart()
+    {
+        SceneManager.LoadScene("Player_Movement_Scene");
     }
 
     private IEnumerator Dash()
@@ -65,5 +84,15 @@ public class PlayerController : MonoBehaviour
         playerHitbox.enabled = true;
         yield return new WaitForSeconds(dashCooldown);
         canDash = true;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        uiManager.UpdateHealthBar(health, currentHealth);
+        if (currentHealth <= 0)
+        {
+            SceneManager.LoadScene("Main_Menu");
+        }
     }
 }
