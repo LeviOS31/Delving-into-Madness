@@ -53,7 +53,8 @@ public class Limb : MonoBehaviour
         CanAttack = false;
         Task.Run(async () =>
         {
-            await Task.Delay((int)attack.cooldown * 1000);
+            float length = attacker.GetComponent<Animation>()[attack.ANIMNAME].length * 1000 + attack.cooldown * 1000;
+            await Task.Delay((int)length);
             CanAttack = true;
         });
     }

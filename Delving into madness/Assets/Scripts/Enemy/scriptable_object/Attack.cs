@@ -15,15 +15,14 @@ public class Attack : ScriptableObject
 
     public async void perform(GameObject target, float distanceToTarget, EnemyController attacker)
     {
-        // Implement the logic to perform the attack on the target
-        // This could involve playing an animation, applying damage, etc.
         Debug.Log("Attacking " + target.name + " with " + attackName + " from " + distanceToTarget);
 
         attacker.GetComponentInChildren<attackDectection>(true).damage = damage;
 
         attacker.GetComponent<Animation>().Play(ANIMNAME);
+        float length = attacker.GetComponent<Animation>()[ANIMNAME].length * 1000;
 
-        await Task.Delay(1000);
+        await Task.Delay((int)length);
         attacker.state = State.Battle;
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using Random = UnityEngine.Random;
 using UnityEngine.AI;
 using TMPro;
+using System.Collections;
 
 public enum State
 {
@@ -11,12 +12,14 @@ public enum State
     Wander,
     Battle,
     Attacking,
+    Staggered
 }
 
 public class EnemyController : MonoBehaviour
 {
     public Transform player; // Reference to the player's transform for chasing and attacking
     public State state;
+    public GameObject BloodParticles;
 
     Navigator navigator;
     LimbController limbcontroller;
@@ -27,6 +30,7 @@ public class EnemyController : MonoBehaviour
     int Speed = 0; // Speed of the enemy, calculated from the limbs
     bool IsDead = false; // Flag to determine if the enemy is dead
     float WanderTimer;
+    float StaggerTimer;
     Vector3 wandertarget = Vector3.zero; // Target position for wandering
     float detectionRange = 50f; // Range within which the enemy can detect the player
     NavMeshAgent agent; // Reference to the NavMeshAgent component for pathfinding
@@ -53,9 +57,9 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
-        if (IsDead)
+        if (IsDead || state == State.Staggered)
         {
-            return; // If the enemy is dead, exit the update loop
+            return;
         }
 
         if (player != null && state != State.Attacking)
@@ -168,9 +172,21 @@ public class EnemyController : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= (int)Math.Round(damage); // Reduce current health by the damage taken
+
+        UI.SetHealth(currentHealth, maxHealth);
+
+        StartCoroutine(StaggerAndKnockback(new Vector3(transform.position.x - player.position.x, 0, transform.position.z - player.position.z), damage, 2f));
+
+        if (BloodParticles != null)
+        {
+            Quaternion rot = transform.rotation * Quaternion.Euler(0, 180, 0);
+            GameObject instance = Instantiate(BloodParticles, transform.position, rot);
+        }
+
         if (currentHealth <= 0)
         {
             Die();
+            return;
         }
     }
 
@@ -179,5 +195,22 @@ public class EnemyController : MonoBehaviour
         IsDead = true;
         Debug.Log("Enemy died!");
         Destroy(gameObject, 0.1f);
+    }
+
+    private IEnumerator StaggerAndKnockback(Vector3 knockbackDirection, float knockbackForce, float staggerDuration)
+    {
+        state = State.Staggered;
+        StaggerTimer = staggerDuration;
+
+        // Apply knockback force
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            rb.AddForce(knockbackDirection.normalized * knockbackForce, ForceMode.Impulse);
+        }
+
+        yield return new WaitForSeconds(staggerDuration);
+
+        state = State.Battle; // Return to idle state after staggering
     }
 }

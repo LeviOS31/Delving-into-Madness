@@ -676,6 +676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c28d523bfc401fb4387d42981b3ab475, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BaseWeapon
+  hitbox: {fileID: 123173956730515178}
   ShieldProtectionAngle: 45
   ShieldDamageReduction: 50
   MaxComboCount: 3
