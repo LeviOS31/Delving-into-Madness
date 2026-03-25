@@ -5,6 +5,8 @@ using Random = UnityEngine.Random;
 using UnityEngine.AI;
 using TMPro;
 using System.Collections;
+using static UnityEngine.EventSystems.EventTrigger;
+using System.Threading.Tasks;
 
 public enum State
 {
@@ -190,11 +192,24 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void Die()
+    private async void Die()
     {
         IsDead = true;
         Debug.Log("Enemy died!");
-        Destroy(gameObject, 0.1f);
+        GetComponent<Rigidbody>().isKinematic = true;
+        GetComponent<NavMeshAgent>().enabled = false;
+        GetComponent<Collider>().enabled = false;
+
+        float bottomY = transform.position.y - 10;
+
+        while (transform.position.y > bottomY)
+        {
+            transform.Translate(Vector3.down * 3 * Time.deltaTime);
+
+            await Task.Yield();
+        }
+
+        Destroy(gameObject);
     }
 
     private IEnumerator StaggerAndKnockback(Vector3 knockbackDirection, float knockbackForce, float staggerDuration)
@@ -204,6 +219,10 @@ public class EnemyController : MonoBehaviour
 
         // Apply knockback force
         Rigidbody rb = GetComponent<Rigidbody>();
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
         if (rb != null)
         {
             rb.AddForce(knockbackDirection.normalized * knockbackForce, ForceMode.Impulse);
