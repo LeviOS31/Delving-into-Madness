@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject playerModel;
     [SerializeField] CapsuleCollider playerHitbox;
     [SerializeField] UIManager uiManager;
+    [SerializeField] GameObject BloodParticles;
 
     [Header("Player Stats")]
     [SerializeField] float movementSpeed = 5f;
@@ -90,9 +91,17 @@ public class PlayerController : MonoBehaviour
     {
         currentHealth -= damage;
         uiManager.UpdateHealthBar(health, currentHealth);
+
+
         if (currentHealth <= 0)
         {
             SceneManager.LoadScene("Main_Menu");
+        }
+
+        if (BloodParticles != null)
+        {
+            Quaternion rot = transform.rotation * Quaternion.Euler(0, 180, 0);
+            GameObject instance = Instantiate(BloodParticles, transform.position, rot);
         }
     }
 }
