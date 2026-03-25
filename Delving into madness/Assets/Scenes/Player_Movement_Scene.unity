@@ -917,6 +917,10 @@ PrefabInstance:
       propertyPath: uiManager
       value: 
       objectReference: {fileID: 1479871071}
+    - target: {fileID: 6440491646417130511, guid: 49e3f5df5f4ba95419656dedc303749f, type: 3}
+      propertyPath: cinemachineCamera
+      value: 
+      objectReference: {fileID: 1711088896}
     - target: {fileID: 8057491140180763977, guid: 49e3f5df5f4ba95419656dedc303749f, type: 3}
       propertyPath: m_Layer
       value: 3
@@ -1737,6 +1741,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1642169331}
   m_CullTransparentMesh: 1
+--- !u!114 &1711088896 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3957751810505181044, guid: 49e3f5df5f4ba95419656dedc303749f, type: 3}
+  m_PrefabInstance: {fileID: 1025594120}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
 --- !u!1 &1846145245
 GameObject:
   m_ObjectHideFlags: 0
