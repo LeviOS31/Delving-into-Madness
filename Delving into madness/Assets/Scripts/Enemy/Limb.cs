@@ -51,12 +51,14 @@ public class Limb : MonoBehaviour
     {
         attack.perform(target, distanceToTarget, attacker);
         CanAttack = false;
+        float length = attacker.GetComponent<Animation>()[attack.ANIMNAME].length * 1000 + attack.cooldown * 1000;
+
         Task.Run(async () =>
         {
-            float length = attacker.GetComponent<Animation>()[attack.ANIMNAME].length * 1000 + attack.cooldown * 1000;
             await Task.Delay((int)length);
             CanAttack = true;
         });
+        Debug.Log("waiting?");
     }
      
 }

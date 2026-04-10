@@ -134,6 +134,7 @@ MonoBehaviour:
   playerModel: {fileID: 5733256667286110692}
   playerHitbox: {fileID: 5392913516704607070}
   uiManager: {fileID: 0}
+  BloodParticles: {fileID: 4853647613575816204, guid: fe136cb312ab5c242b6c2010759b664d, type: 3}
   movementSpeed: 5
   turnSpeed: 5
   dashDuration: 0.5

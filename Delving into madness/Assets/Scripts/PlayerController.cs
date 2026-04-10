@@ -1,7 +1,11 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using TMPro;
+using Unity.Cinemachine;
+using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
@@ -10,6 +14,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] GameObject playerModel;
     [SerializeField] CapsuleCollider playerHitbox;
     [SerializeField] UIManager uiManager;
+    [SerializeField] GameObject BloodParticles;
+    [SerializeField] CinemachineCamera cinemachineCamera;
 
     [Header("Player Stats")]
     [SerializeField] float movementSpeed = 5f;
@@ -20,6 +26,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float health = 100f;
     private bool canDash = true;
     private float currentHealth;
+    private bool isDead = false;
 
 
     private InputAction movementAction;
@@ -60,11 +67,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnDash()
     {
+        if (isDead) return;
         if (canDash) StartCoroutine(Dash());
     }
 
     private void OnAttack()
     {
+        if (isDead) return;
         weaponController.LightAttack();
     }
 
@@ -86,13 +95,36 @@ public class PlayerController : MonoBehaviour
         canDash = true;
     }
 
-    public void TakeDamage(float damage)
+    public async void TakeDamage(float damage)
     {
+        if (isDead) return;
         currentHealth -= damage;
         uiManager.UpdateHealthBar(health, currentHealth);
+
+
         if (currentHealth <= 0)
         {
+            isDead = true;
+            disableMovement = true;
+
+            GetComponent<Rigidbody>().isKinematic = true;
+            GetComponent<Collider>().enabled = false;
+            cinemachineCamera.enabled = false;
+
+            while (transform.position.y > -10)
+            {
+                transform.Translate(Vector3.down * 3 * Time.deltaTime);
+
+                await Task.Yield();
+            }
+
             SceneManager.LoadScene("Main_Menu");
+        }
+
+        if (BloodParticles != null)
+        {
+            Quaternion rot = transform.rotation * Quaternion.Euler(0, 180, 0);
+            GameObject instance = Instantiate(BloodParticles, transform.position, rot);
         }
     }
 }
